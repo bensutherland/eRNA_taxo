@@ -3,3 +3,4 @@
 *.fastq.gz
 *multiqc_data*
 *.fq.gz
+*.swp
