@@ -34,5 +34,5 @@ ls -1 $RAW_FOLDER/*.fastq.gz |
     done
 
 # Move trimmed files to trimmed folder
-#mv $RAW_FOLDER/*_trimmed.fastq.gz $TRIMMED_FOLDER
+mv $RAW_FOLDER/*_trimmed.fq.gz $TRIMMED_FOLDER
 
