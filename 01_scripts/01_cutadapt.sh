@@ -20,8 +20,7 @@ ls -1 $RAW_FOLDER/*.fastq.gz |
         echo "Trimming $i"
         cutadapt -a $R1_ADAPTER -A $R2_ADAPTER \
         --interleaved \
-        -o "$i"ilvd_trimmed.fq.gz
-        #-o "$i"R1_trimmed.fq.gz -p "$i"R2_trimmed.fq.gz \
+        -o "$i"ilvd_trimmed.fq.gz \
         "$i"R1_001.fastq.gz "$i"R2_001.fastq.gz \
         -q 20
     done
