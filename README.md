@@ -34,3 +34,5 @@
 ### The interleaved output has to be decompressed
 `for i in 03_trimmed/*.fq.gz ; do gunzip $i ; done`
 
+
+
