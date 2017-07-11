@@ -22,7 +22,8 @@ ls -1 $RAW_FOLDER/*.fastq.gz |
         --interleaved \
         -o "$i"ilvd_trimmed.fq.gz \
         "$i"R1_001.fastq.gz "$i"R2_001.fastq.gz \
-        -q 20
+        -q 20 \
+        -m 50
     done
 
 

@@ -4,7 +4,7 @@
 `java`    
 `fastqc`    
 `multiqc`    
-`trimmomatic`    
+`cutadapt`  http://cutadapt.readthedocs.io/en/stable/index.html        
 `SortMeRNA` http://bioinfo.lifl.fr/RNA/sortmerna/    
 
 ### 1. Quality check and trimming
@@ -16,12 +16,12 @@
 ### Use multiqc to summarize fastqc results, and output to fastqc results folder
 `multiqc -o ./02_raw_data/fastqc_results/ ./02_raw_data/fastqc_results/`
 
-### Trim
-`./01_trimming.sh`
+### Trim for the forward and reverse adapters (details in script), for quality, and interleave the output.
+`./01_cutadapt.sh`
 
 ### Use fastqc again to check trimmed quality
 `mkdir 03_trimmed/fastqc_trimmed_results`
-`fastqc 03_trimmed/*_paired_trimmed.fq.gz -o 03_trimmed/fastqc_trimmed_results/`
+`fastqc 03_trimmed/*_ilvd_trimmed.fq.gz -o 03_trimmed/fastqc_trimmed_results/`
 
 
 ### Summarize with multiqc
