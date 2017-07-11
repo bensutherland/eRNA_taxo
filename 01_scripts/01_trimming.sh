@@ -4,7 +4,7 @@
 # Global variables
 RAW_FOLDER="02_raw_data"
 TRIMMED_FOLDER="03_trimmed"
-VECTORS="./00_archive/univec_trimmomatic.fasta"
+VECTORS="./00_archive/truseq_universal.fasta"
 TRIMMOMATIC_PROGRAM="/home/ben/Programs/Trimmomatic-0.36/trimmomatic-0.36.jar"
 
 # User set variable

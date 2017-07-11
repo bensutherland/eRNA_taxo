@@ -5,7 +5,7 @@
 `fastqc`    
 `multiqc`    
 `trimmomatic`    
-
+`SortMeRNA` http://bioinfo.lifl.fr/RNA/sortmerna/    
 
 ### 1. Quality check and trimming
 ### Use fastqc to check quality
@@ -25,5 +25,8 @@
 
 
 ### Summarize with multiqc
- 
+`multiqc -o 03_trimmed/fastqc_trimmed_results/ 03_trimmed/fastqc_trimmed_results/`     
 
+### 2. Use SortMeRNA to filter ribosomal RNA from metatranscriptomic data
+# First index the fasta database. Change the path to your SortMeRNA installation folder.    
+`./01_script/02a_index_SortMeRNA_db.sh`
