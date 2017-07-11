@@ -29,10 +29,11 @@
 
 ### 2. Use SortMeRNA to filter ribosomal RNA from metatranscriptomic data
 # First index the fasta database. Change the path to your SortMeRNA installation folder.    
-`./01_script/02a_index_SortMeRNA_db.sh`
+`./01_scripts/02a_index_SortMeRNA_db.sh`
 
 ### The interleaved output has to be decompressed
 `for i in 03_trimmed/*.fq.gz ; do gunzip $i ; done`
 
-
+### Then run the mapping script
+`./01_scripts/02b_SortMeRNA.sh`
 
