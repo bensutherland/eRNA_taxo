@@ -5,3 +5,5 @@
 *.fq.gz
 *.swp
 *.fq
+*.log
+*.sam
