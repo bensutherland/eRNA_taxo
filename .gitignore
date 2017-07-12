@@ -4,3 +4,4 @@
 *multiqc_data*
 *.fq.gz
 *.swp
+*.fq
