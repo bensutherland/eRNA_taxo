@@ -3,14 +3,14 @@
 
 # Global variables
 TRIMMED_FOLDER="03_trimmed"
-SORTMERNA_DB="/home/ben/Programs/sortmerna-2.1-linux-64"
+SORTMERNA_DB="/home/ben/Programs/sortmerna-2.1"
 
 # User set variable
 NUM_CPU="12"
 
 
 # Running SortMeRNA
-ls -1 $TRIMMED_FOLDER/S13*_ilvd_trimmed.fq |
+ls -1 $TRIMMED_FOLDER/*_ilvd_trimmed.fq |
     sort -u |
     while read i
     do

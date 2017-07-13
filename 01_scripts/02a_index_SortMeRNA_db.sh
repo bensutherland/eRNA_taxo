@@ -2,7 +2,7 @@
 # Index the SortMeRNA databases in the main SortMeRNA directory 
 
 # Global variables
-SORTMERNA_DB="/home/ben/Programs/sortmerna-2.1-linux-64"
+SORTMERNA_DB="/home/ben/Programs/sortmerna-2.1"
 
 # User set variable
 NUM_CPU="10"
