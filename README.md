@@ -38,6 +38,13 @@ Note: Confirm the path to SortMeRNA installation in the following script:
 SortMeRNA requires decompressed, interleaved input.    
 `for i in 03_trimmed/*.fq.gz ; do gunzip $i ; done`
 
-#### 
+#### Separate rRNA from metatranscriptome data
 `./01_scripts/02b_SortMeRNA.sh`
+
+### 3. Metatranscriptomic analysis
+
+
+
+### 4. rRNA taxonomic analysis
+
 
