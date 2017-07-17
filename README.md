@@ -40,6 +40,10 @@ SortMeRNA requires decompressed, interleaved input.
 
 #### Separate rRNA from metatranscriptome data
 `./01_scripts/02b_SortMeRNA.sh`
+This will put your data into `04_sorted`   
+To see pertinent log information, run    
+`tail -n 20 04_sorted/*.log | less`
+
 
 ### 3. Metatranscriptomic analysis
 
