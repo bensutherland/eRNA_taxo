@@ -73,5 +73,6 @@ De-interleave the concatenated fasta file.
 First need to deinterleave the concatenated fasta    
 `deinterleave_fasta.sh < 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa 04_sorted/all_samples_trimmed_non_rRNA_R1.fa 04_sorted/all_samples_trimmed_non_rRNA_R2.fa`
 
-
+Then launch trinity
+`Trinity --seqType fq --left ./04_sorted/all_samples_trimmed_non_rRNA_R1.fa --right ./04_sorted/all_samples_trimmed_non_rRNA_R2.fa --CPU 6 --max_memory 100G`
 
