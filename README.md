@@ -44,11 +44,25 @@ This will put your data into `04_sorted`
 To see pertinent log information, run    
 `tail -n 20 04_sorted/*.log | less`
 
-
 ### 3. Metatranscriptomic analysis
+First assemble the reference transcriptome from the reads using `IDBA-Tran`    
 
+PE data needs to be in interleaved fasta format. So first format the output from SortMeRNA to fasta format from fastq.     
+`for i in 04_sorted/*ilvd_trimmed.fq_non_rRNA.fq ; do fq2fa --paired $i ${i%.fq}.fa ; done`    
 
+Combine all libraries into a single fasta file    
+`cat 04_sorted/*ilvd_trimmed.fq_non_rRNA.fa > 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa`
 
-### 4. rRNA taxonomic analysis
+Start the assembly with the interleaved .fa files.    
+`idba_tran --read 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa --num_threads=6 --out 05_assembled`
 
+Note: have to follow instructions to edit the sequence length    
+"please modify the constant kMaxShortSequence in src/sequence/short_sequence.h to support longer read length"      
+static const uint32_t kMaxShortSequence = 128;   
+to   
+static const uint32_t kMaxShortSequence = 350;    
+as described here http://seqanswers.com/forums/showthread.php?t=29109
+
+###
+Next, try assembling with trinity
 
