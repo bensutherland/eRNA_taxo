@@ -54,8 +54,10 @@ Combine all libraries into a single fasta file
 `cat 04_sorted/*ilvd_trimmed.fq_non_rRNA.fa > 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa`
 
 Start the assembly with the interleaved .fa files.    
-`idba_tran --read 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa --num_threads=6 --out 05_assembled`
+`idba_tran --read 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa --num_threads=8 --out 05_assembled`
 
+
+#### Edit IDBA-Tran
 Note: have to follow instructions to edit the sequence length    
 "please modify the constant kMaxShortSequence in src/sequence/short_sequence.h to support longer read length"      
 static const uint32_t kMaxShortSequence = 128;   
@@ -63,6 +65,13 @@ to
 static const uint32_t kMaxShortSequence = 350;    
 as described here http://seqanswers.com/forums/showthread.php?t=29109
 
-###
+#### Trinity assembly
 Next, try assembling with trinity
+De-interleave the concatenated fasta file.   
+`fastaq_deinterleave.1 `
+
+First need to deinterleave the concatenated fasta    
+`deinterleave_fasta.sh < 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa 04_sorted/all_samples_trimmed_non_rRNA_R1.fa 04_sorted/all_samples_trimmed_non_rRNA_R2.fa`
+
+
 

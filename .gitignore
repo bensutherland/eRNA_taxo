@@ -8,3 +8,6 @@
 *.log
 *.sam
 *.fa
+*.bck
+log
+begin
