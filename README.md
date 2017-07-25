@@ -62,17 +62,16 @@ Start the assembly with the interleaved .fa files.
 `idba_tran --read 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa --num_threads=8 --out 05_assembled`
 
 
-#### Trinity assembly
-#  Currently not working due to not enough power
-#  Next, try assembling with trinity
-#  De-interleave the concatenated fasta file.   
-#  `fastaq_deinterleave.1 `
-#  
-#  First need to deinterleave the concatenated fasta    
-#  `deinterleave_fasta.sh < 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa 04_sorted/all_samples_trimmed_non_rRNA_R1.fa 04_sorted/all_samples_trimmed_non_rRNA_R2.fa`
-#  
-#  Then launch trinity
-#  `Trinity --seqType fq --left ./04_sorted/all_samples_trimmed_non_rRNA_R1.fa --right ./04_sorted/all_samples_trimmed_non_rRNA_R2.fa --CPU 6 --max_memory 100G`
-#  
+### Trinity assembly
+Next, try assembling with trinity
+De-interleave the concatenated fasta file.   
+`fastaq_deinterleave.1 `
+
+First need to deinterleave the concatenated fasta    
+`deinterleave_fasta.sh < 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa 04_sorted/all_samples_trimmed_non_rRNA_R1.fa 04_sorted/all_samples_trimmed_non_rRNA_R2.fa`
+
+Then launch trinity
+`Trinity --seqType fq --left ./04_sorted/all_samples_trimmed_non_rRNA_R1.fa --right ./04_sorted/all_samples_trimmed_non_rRNA_R2.fa --CPU 6 --max_memory 100G`
+  
 
 
