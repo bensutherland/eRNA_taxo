@@ -47,6 +47,11 @@ To see pertinent log information, run
 ### 3. Metatranscriptomic analysis
 First assemble the reference transcriptome from the reads using `IDBA-Tran`    
 
+Prepare IDBA-Tran by editing for longer reads (MiSeq)
+"please modify the constant kMaxShortSequence in src/sequence/short_sequence.h to support longer read length"      
+`static const uint32_t kMaxShortSequence = 128` to `static const uint32_t kMaxShortSequence = 350`    
+More info: http://seqanswers.com/forums/showthread.php?t=29109
+
 PE data needs to be in interleaved fasta format. So first format the output from SortMeRNA to fasta format from fastq.     
 `for i in 04_sorted/*ilvd_trimmed.fq_non_rRNA.fq ; do fq2fa --paired $i ${i%.fq}.fa ; done`    
 
@@ -57,22 +62,17 @@ Start the assembly with the interleaved .fa files.
 `idba_tran --read 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa --num_threads=8 --out 05_assembled`
 
 
-#### Edit IDBA-Tran
-Note: have to follow instructions to edit the sequence length    
-"please modify the constant kMaxShortSequence in src/sequence/short_sequence.h to support longer read length"      
-static const uint32_t kMaxShortSequence = 128;   
-to   
-static const uint32_t kMaxShortSequence = 350;    
-as described here http://seqanswers.com/forums/showthread.php?t=29109
-
 #### Trinity assembly
-Next, try assembling with trinity
-De-interleave the concatenated fasta file.   
-`fastaq_deinterleave.1 `
+#  Currently not working due to not enough power
+#  Next, try assembling with trinity
+#  De-interleave the concatenated fasta file.   
+#  `fastaq_deinterleave.1 `
+#  
+#  First need to deinterleave the concatenated fasta    
+#  `deinterleave_fasta.sh < 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa 04_sorted/all_samples_trimmed_non_rRNA_R1.fa 04_sorted/all_samples_trimmed_non_rRNA_R2.fa`
+#  
+#  Then launch trinity
+#  `Trinity --seqType fq --left ./04_sorted/all_samples_trimmed_non_rRNA_R1.fa --right ./04_sorted/all_samples_trimmed_non_rRNA_R2.fa --CPU 6 --max_memory 100G`
+#  
 
-First need to deinterleave the concatenated fasta    
-`deinterleave_fasta.sh < 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa 04_sorted/all_samples_trimmed_non_rRNA_R1.fa 04_sorted/all_samples_trimmed_non_rRNA_R2.fa`
-
-Then launch trinity
-`Trinity --seqType fq --left ./04_sorted/all_samples_trimmed_non_rRNA_R1.fa --right ./04_sorted/all_samples_trimmed_non_rRNA_R2.fa --CPU 6 --max_memory 100G`
 

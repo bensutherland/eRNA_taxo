@@ -11,3 +11,4 @@
 *.bck
 log
 begin
+05_assembled/*
