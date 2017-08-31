@@ -19,12 +19,11 @@ ls -1 $TRIMMED_FOLDER/*non_rRNA.fq |
 	  name=$(basename $i)
 	  label=$(echo $name | perl -pe 's/\_L001\_ilvd\_trimmed\.fq\_non\_rRNA\.fq//')
 	  ID="@RG\tID:${label}\tSM:${label}\tPL:Illumina"
-	  bowtie2 --end-to-end -k 40 --threads $NUM_THREADS --rg-id $ID -x $REFERENCE --interleaved $i -S $i.bowtie2.sam
-	  #samtools view -Sb $i.bowtie2.sam > $i.bowtie2.unsorted.bam
-	  #samtools sort -n -o $i.bowtie2.sorted.bam $i.bowtie2.unsorted.bam
-	  #samtools index $i.bowtie2.sorted.bam # note, if samtools sort -n is used, cannot index
+	  #bowtie2 --end-to-end -k 40 --threads $NUM_THREADS --rg-id $ID -x $REFERENCE --interleaved $i -S $i.bowtie2.sam
+	  samtools view -Sb $i.bowtie2.sam > $i.bowtie2.unsorted.bam
+	  samtools sort -n $i.bowtie2.unsorted.bam $i.bowtie2.sorted
       #rm $i.bowtie2.sam
 done
 
 # clean up space
-#mv ./$TRIMMED_FOLDER/*.sam ./$MAPPED_FOLDER/
+mv ./$TRIMMED_FOLDER/*.bam ./$MAPPED_FOLDER/
