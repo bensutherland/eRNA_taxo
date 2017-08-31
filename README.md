@@ -58,6 +58,8 @@ IDBA-Tran requires interleaved fasta. Convert interleaved fastq to fasta
 Assemble each library individually to reduce computational load.   
 `./01_scripts/03_assemble.sh`
 
+Copy the assemblies with names over to next folder:   
+`for i in 05_assembled/*/contig.fa ; do RENAME_ID=$(echo $i | awk -F/ '{ print $2"_contig.fa" }') ; echo "copying $RENAME_ID" ; cp $i 06_metatranscriptome/$RENAME_ID ; done`
 
 B) Merge assemblies    
 
