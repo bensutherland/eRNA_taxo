@@ -61,10 +61,30 @@ Assemble each library individually to reduce computational load.
 Copy the assemblies with names over to next folder:   
 `for i in 05_assembled/*/contig.fa ; do RENAME_ID=$(echo $i | awk -F/ '{ print $2"_contig.fa" }') ; echo "copying $RENAME_ID" ; cp $i 06_metatranscriptome/$RENAME_ID ; done`
 
+Merge into one metatranscriptome file (with redundancy):    
+`cat 06_metatranscriptome/*.fa > 06_metatranscriptome/assemblies_merged.fa`
+
 B) Merge assemblies    
+Dedupe.sh from bbmap:   
+`dedupe.sh in=assemblies_merged.fa out=assemblies_merged_bbmap_reduced.fa threads=1 uniquenames=t`
 
+*OR*   
 
+cd-hit-est from cd-hit:    
+`cd-hit-est -i ./assemblies_merged.fa -o assemblies_merged_cd-hit-est90_reduced.fa -c 0.9 -T 4 -M 9000`
 
+### 4. Quantification
+To quantify transcripts, clone the following repo.
+```
+cd ..
+git clone https://github.com/bensutherland/Simple_reads_to_counts  
+cp -l eRNA_taxo/04_sorted/*_non_rRNA.fa Simple_reads_to_counts/03_trimmed/
+cd Simple_reads_to_counts/
+```
+
+*OR*
+
+cd 06_metatranscriptome/ ; bowtie2-build -f assemblies_merged_bbmap_reduced.fa assemblies_merged_bbmap_reduced
 
 #todo# not yet using this
 ### Trinity assembly
