@@ -6,6 +6,12 @@ This pipeline was developed as part of the Molecular Genetics Lab at Pacific Bio
 `multiqc`   http://multiqc.info/     
 `cutadapt`  http://cutadapt.readthedocs.io/en/stable/index.html        
 `SortMeRNA` http://bioinfo.lifl.fr/RNA/sortmerna/    
+`idba-tran` https://github.com/loneknightpy/idba     
+`bbmap`     https://sourceforge.net/projects/bbmap/    
+`cd-hit-est`http://weizhongli-lab.org/cd-hit/     
+`bowtie2`   http://bowtie-bio.sourceforge.net/bowtie2/index.shtml     
+`express`   https://pachterlab.github.io/eXpress/index.html      
+
 
 ### 1. Quality check and trimming
 #### Run FastQC on raw data   
@@ -74,17 +80,22 @@ cd-hit-est from cd-hit:
 `cd-hit-est -i ./assemblies_merged.fa -o assemblies_merged_cd-hit-est90_reduced.fa -c 0.9 -T 4 -M 9000`
 
 ### 4. Quantification
-To quantify transcripts, clone the following repo.
-```
-cd ..
-git clone https://github.com/bensutherland/Simple_reads_to_counts  
-cp -l eRNA_taxo/04_sorted/*_non_rRNA.fa Simple_reads_to_counts/03_trimmed/
-cd Simple_reads_to_counts/
-```
+First index the transcriptome:   
+`cd 06_metatranscriptome/ ; bowtie2-build -f assemblies_merged_bbmap_reduced.fa assemblies_merged_bbmap_reduced`    
 
-*OR*
+Launch bowtie2 mapping script:   
+`./01_scripts/04_bowtie2.sh`    
 
-cd 06_metatranscriptome/ ; bowtie2-build -f assemblies_merged_bbmap_reduced.fa assemblies_merged_bbmap_reduced
+This will produce .bam files. 
+
+Quantify bam files:
+`./01_scripts/05_express.sh`    
+
+### 5. Normalization and Differential Expression
+Work within R using the script in the directory     
+`01_scripts/06_edgeR_normalization.R`    
+
+
 
 #todo# not yet using this
 ### Trinity assembly
@@ -97,6 +108,3 @@ First need to deinterleave the concatenated fasta
 
 Then launch trinity
 `Trinity --seqType fq --left ./04_sorted/all_samples_trimmed_non_rRNA_R1.fa --right ./04_sorted/all_samples_trimmed_non_rRNA_R2.fa --CPU 6 --max_memory 100G`
-  
-
-
