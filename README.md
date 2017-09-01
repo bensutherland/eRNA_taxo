@@ -70,9 +70,12 @@ Copy the assemblies with names over to next folder:
 Merge into one metatranscriptome file (with redundancy):    
 `cat 06_metatranscriptome/*.fa > 06_metatranscriptome/assemblies_merged.fa`
 
+Remove spaces in the fasta file name
+`sed 's/\ /\_/g' 06_metatranscriptome/assemblies_merged.fa > 06_metatranscriptome/assembles_merged_for_dedupe.fa`
+
 B) Merge assemblies    
 Dedupe.sh from bbmap:   
-`dedupe.sh in=assemblies_merged.fa out=assemblies_merged_bbmap_reduced.fa threads=1 uniquenames=t`
+`dedupe.sh in=06_metatranscriptome/assembles_merged_for_dedupe.fa out=assemblies_merged_bbmap_reduced.fa threads=4 uniquenames=t`
 
 *OR*   
 
@@ -81,7 +84,7 @@ cd-hit-est from cd-hit:
 
 ### 4. Quantification
 First index the transcriptome:   
-`cd 06_metatranscriptome/ ; bowtie2-build -f assemblies_merged_bbmap_reduced.fa assemblies_merged_bbmap_reduced`    
+`bowtie2-build -f 06_metatranscriptome/assemblies_merged_bbmap_reduced.fa 06_metatranscriptome/assemblies_merged_bbmap_reduced`    
 
 Launch bowtie2 mapping script:   
 `./01_scripts/04_bowtie2.sh`    
