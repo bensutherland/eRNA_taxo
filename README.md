@@ -70,12 +70,12 @@ Copy the assemblies with names over to next folder:
 Merge into one metatranscriptome file (with redundancy):    
 `cat 06_metatranscriptome/*.fa > 06_metatranscriptome/assemblies_merged.fa`
 
-Remove spaces in the fasta file name
-`sed 's/\ /\_/g' 06_metatranscriptome/assemblies_merged.fa > 06_metatranscriptome/assembles_merged_for_dedupe.fa`
+Remove spaces in the fasta file name     
+`sed 's/\ /\_/g' 06_metatranscriptome/assemblies_merged.fa > 06_metatranscriptome/assemblies_merged_for_dedupe.fa`
 
 B) Merge assemblies    
 Dedupe.sh from bbmap:   
-`dedupe.sh in=06_metatranscriptome/assembles_merged_for_dedupe.fa out=assemblies_merged_bbmap_reduced.fa threads=4 uniquenames=t`
+`dedupe.sh in=06_metatranscriptome/assemblies_merged_for_dedupe.fa out=assemblies_merged_bbmap_reduced.fa threads=4 uniquenames=t`
 
 *OR*   
 
