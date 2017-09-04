@@ -4,6 +4,8 @@
 # Set environment variables
 MAPPED_FOLDER="07_mapped"
 COUNT_FOLDER="08_gx_levels"
+
+# Choose reference
 REFERENCE="06_metatranscriptome/assemblies_merged_bbmap_reduced.fa"
 
 # Produce counts per individual with express 
