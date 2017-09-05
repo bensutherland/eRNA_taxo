@@ -16,3 +16,4 @@ begin
 *.bt2
 .Rproj.user
 *.xprs
+*.csv
