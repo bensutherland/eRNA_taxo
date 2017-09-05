@@ -15,9 +15,8 @@ ls -1 $MAPPED_FOLDER/*.sorted.bam |
     do
         echo "Counts for sample" $i
         name=$(basename $i)
-        express $REFERENCE $i
+        express $REFERENCE $i --max-read-len=300
         mv results.xprs $COUNT_FOLDER/"$name"_results.xprs
         mv params.xprs $COUNT_FOLDER/"$name"_params.xprs 
     done
-
 

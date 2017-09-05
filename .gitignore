@@ -14,3 +14,5 @@ log
 begin
 05_assembled/*
 *.bt2
+.Rproj.user
+*.xprs
