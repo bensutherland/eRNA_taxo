@@ -18,3 +18,5 @@ begin
 *.xprs
 *.csv
 *.pdf
+*.Rhistory
+*.clstr
