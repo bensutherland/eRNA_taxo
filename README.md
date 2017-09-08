@@ -104,6 +104,10 @@ Work within R using the script in the directory
 
 
 ### 6. Annotate transcriptome
+For this I suggest using Eric Normandeau's `go_enrichment` pipeline    
+https://github.com/enormandeau/go_enrichment    
+This pipeline annotates with uniprot's swissprot database and performs enrichment tests with goatools https://github.com/tanghaibao/goatools.    
+
 
 
 
