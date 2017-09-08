@@ -7,7 +7,7 @@
 #biocLite("edgeR")
 require("edgeR")
 
-biocLite("locfit")
+#biocLite("locfit")
 require("locfit")
 
 # User guides are here:
@@ -34,8 +34,6 @@ dim(my.counts) #total unique tags = 4,528,162
 
 # Set up DGEList
 rownames(my.counts) <- my.counts[,1]
-head(my.counts)
-
 my.counts.round <- round(my.counts[,-1])
 str(my.counts.round)
 
@@ -63,26 +61,31 @@ dim(my.counts)
 # Use TMM normalization, as it takes into account highly expressed genes that may take up sequencing rxn and make other genes look down-reg.
 my.counts <- calcNormFactors(my.counts, method = c("TMM"))
 my.counts$samples
+
+# Plot norm.factors by library size
 plot(my.counts$samples$norm.factors ~ my.counts$samples$lib.size)
 
-
 #### 3. Create design matrix ####
-interp$file.name!="S13"
-#sampleType <- interp$Range
+# Use approximated variables in bins
 binary.pCO2 <- interp$Range[interp$file.name!="S13"] # currently missing one
 binary.season <- interp$season[interp$file.name!="S13"] # currently missing one
 
-designMat <- model.matrix(~binary.pCO2)
+# Build a design matrix
+#designMat <- model.matrix(~binary.pCO2)
 designMat <- model.matrix(~binary.pCO2 * binary.season)
-designMat <- model.matrix(~binary.season)
+#designMat <- model.matrix(~binary.season)
 
 # Estimate dispersions (measure inter-library variation per tag)
-#my.counts <- estimateDisp(my.counts) # note that this can use a design matrix when provided 
+# IT appears that estimateDisp is for simpler models, whereas estimateGLMCommon etc. is for when doing glms
 my.counts <- estimateDisp(my.counts, design=designMat) # note that this can use a design matrix when provided 
+#"qCML method is only applicable on datasets with a single factor design
+#since it fails to take into account the effects from multiple factors in a more complicated
+#experiment."
 
-my.counts <- estimateGLMCommonDisp(my.counts, design=designMat)
-my.counts <- estimateGLMTrendedDisp(my.counts, design=designMat)
-my.counts <- estimateGLMTagwiseDisp(my.counts, design=designMat)
+
+# my.counts <- estimateGLMCommonDisp(my.counts, design=designMat)
+# my.counts <- estimateGLMTrendedDisp(my.counts, design=designMat)
+# my.counts <- estimateGLMTagwiseDisp(my.counts, design=designMat)
 
 summary(my.counts$prior.df) # est. overall var. across genome for dataset
 sqrt(my.counts$common.disp) #coeff of var, for biol. var
@@ -113,42 +116,46 @@ plotBCV(my.counts)
 #plot using sample IDs
 plotMDS(x = my.counts, cex= 0.8) # note that this is supposed to be run on whatever you wrote calcNormFact() to
 
+# Note that it is the date of the sample that explains PC1
 plotMDS(x = my.counts, cex = 0.8
         , labels = 
 #          round(
-            interp$date.extract[match(row.names(my.counts$samples), interp$file.name)]
+            interp$date[match(row.names(my.counts$samples), interp$file.name)]
 #            )
           )
 
-
-# #plot using sex
-# plotMDS(x = my.counts, cex= 0.8
-#         , labels = interp$sex[match(my.counts$samples$files, interp$file.name)])
-# #plot using maturity and sex
-# plotMDS(x = my.counts, cex= 0.8
-#         , labels = paste(
-#           interp$sex[match(my.counts$samples$files, interp$file.name)]
-#             , interp$poids.sachet.foie[match(my.counts$samples$files, interp$file.name)]
-#           , sep = ""))
-# 
 # # note, this is how matching works:
 # interp$sex[match(my.counts$samples$files, interp$file.name)] # matches order 
 # interp$sex #see not the same
 
-
-#### Differential Expression ####
+#### 6. Differential Expression ####
 fit <- glmFit(y = my.counts, design = designMat)
-lrt <- glmLRT(fit)
-edgeR_result <- topTags(lrt)
 
-#?decideTests
-deGenes <- decideTestsDGE(lrt, p=0.001)
-deGenes <- rownames(lrt)[as.logical(deGenes)]
-plotSmear(lrt, de.tags = deGenes)
-abline(h=c(-1,1), col =2)
-abline(v=cpm.filt, col =2)
+lrt <- glmLRT(glmfit = fit, coef = 3)
 
-deGenes
+# Find DE genes for each contrast
+lrt.coef1 <- glmLRT(fit, coef = 1) # intercept (all genes)
+lrt.coef2 <- glmLRT(fit, coef = 2) # pCO2
+lrt.coef3 <- glmLRT(fit, coef = 3) # season
+lrt.coef4 <- glmLRT(fit, coef = 4) # pCO2 x season (effect of pCO2 depends on the season)
+
+# Set lrt of choice
+LOC <- lrt.coef2
+dim(topTags(LOC, p.value=0.05, n = 15000)) # how many genes DE w/ adj. p-val < 0.05
+
+# # Obtain result
+# edgeR_result <- topTags(lrt.coef2, p.value=1, n = 15000)
+# dim(edgeR_result)
+
+# ## Alternate method, usign decideTests
+# #?decideTests
+# deGenes <- decideTestsDGE(lrt, p=0.001)
+# deGenes <- rownames(lrt)[as.logical(deGenes)]
+# plotSmear(lrt, de.tags = deGenes)
+# abline(h=c(-1,1), col =2)
+# abline(v=cpm.filt, col =2)
+# 
+# deGenes
 
 #### Export Results ####
 output <- topTags(lrt, n=nrow(lrt), sort.by="logFC")[[1]]
