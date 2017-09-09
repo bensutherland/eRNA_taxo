@@ -108,4 +108,10 @@ For this I suggest using Eric Normandeau's `go_enrichment` pipeline
 https://github.com/enormandeau/go_enrichment    
 This pipeline annotates with uniprot's swissprot database and performs enrichment tests with goatools https://github.com/tanghaibao/goatools.    
 
+# Optional: Annotate only expressed transcripts
+Unwrap fasta file
+Use fasta_unwrap.py from Eric Normandeau's scripts folder to unwrap the fasta file to obtain only the expressed contigs.
+
+`for i in `cat expr_contigs.csv` ; do grep -A1 $i 06_met
+atranscriptome/assemblies_merged_red0.95_bbmap_red_unwrapped.fa ; done > 06_metatranscriptome/selected_contigs_2017-09-09.fa`
 
