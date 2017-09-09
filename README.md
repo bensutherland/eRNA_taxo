@@ -109,17 +109,3 @@ https://github.com/enormandeau/go_enrichment
 This pipeline annotates with uniprot's swissprot database and performs enrichment tests with goatools https://github.com/tanghaibao/goatools.    
 
 
-
-
-
-#todo# not yet using this
-### Trinity assembly
-Next, try assembling with trinity
-De-interleave the concatenated fasta file.   
-`fastaq_deinterleave.1 `
-
-First need to deinterleave the concatenated fasta    
-`deinterleave_fasta.sh < 04_sorted/all_samples_ilvd_trimmed_non_rRNA.fa 04_sorted/all_samples_trimmed_non_rRNA_R1.fa 04_sorted/all_samples_trimmed_non_rRNA_R2.fa`
-
-Then launch trinity
-`Trinity --seqType fq --left ./04_sorted/all_samples_trimmed_non_rRNA_R1.fa --right ./04_sorted/all_samples_trimmed_non_rRNA_R2.fa --CPU 6 --max_memory 100G`
