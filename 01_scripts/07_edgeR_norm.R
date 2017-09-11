@@ -117,6 +117,27 @@ plotMDS(x = my.counts, cex = 0.8
 # interp$sex[match(my.counts$samples$files, interp$file.name)] # matches order 
 # interp$sex #see not the same
 
+# Clean up mds plot
+sub(pattern = "_.*", replacement = "", x= row.names(my.counts$samples))
+
+plotMDS(x = my.counts, cex = 1.2
+        , labels = 
+          #          round(
+          paste(
+            sub(pattern = "_.*", replacement = "", x=
+                  interp$file.name[match(row.names(my.counts$samples), interp$file.name)])
+          ,  interp$date[match(row.names(my.counts$samples), interp$file.name)]  
+          , sep = "_"
+          )
+        
+          
+        #            )
+)
+
+
+
+
+
 #### 6. Differential Expression ####
 fit <- glmFit(y = my.counts, design = designMat)
 
