@@ -6,6 +6,8 @@
 #source("http://bioconductor.org/biocLite.R")
 #biocLite("edgeR")
 require("edgeR")
+#install.packages("readr")
+require("readr")
 
 #biocLite("locfit")
 require("locfit")
@@ -55,7 +57,7 @@ min.ind <- 5 # choose the minimum number of individuals that need to pass the th
 keep <- rowSums(cpm(my.counts)>cpm.filt) >= min.ind # Find which transcripts pass the filter
 table(keep) # gives number passing, number failing
 ##bbmap_only: total retained (TRUE) =    
-##cdhit95_bbmap: total retained (TRUE) = 20488 
+##cdhit95_bbmap: total retained (TRUE) = 20488 # new 20363
 
 # subset DGEList
 my.counts <- my.counts[keep, , keep.lib.sizes=FALSE] #keep.lib.sizes = T retains original lib sizes, otherwise recomputes w remaining tags
@@ -101,7 +103,7 @@ sqrt(my.counts$common.disp) #coeff of var, for biol. var
 plotBCV(my.counts)
 
 
-#### 5. Visualize data ####
+#### 4. Visualize data ####
 #plot using sample IDs
 plotMDS(x = my.counts, cex= 0.8) # note that this is supposed to be run on whatever you wrote calcNormFact() to
 
@@ -138,7 +140,7 @@ plotMDS(x = my.counts, cex = 1.2
 
 
 
-#### 6. Differential Expression ####
+#### 5. Differential Expression ####
 fit <- glmFit(y = my.counts, design = designMat)
 
 lrt <- glmLRT(glmfit = fit, coef = 3)
@@ -150,54 +152,45 @@ lrt.coef3 <- glmLRT(fit, coef = 3) # season
 lrt.coef4 <- glmLRT(fit, coef = 4) # pCO2 x season (effect of pCO2 depends on the season)
 
 # Set lrt of choice
-LOC <- lrt.coef4
+LOC <- lrt.coef2
 dim(topTags(LOC, p.value=0.05, n = 15000)) # how many genes DE w/ adj. p-val < 0.05
 
 # # Obtain result
-# edgeR_result <- topTags(lrt.coef2, p.value=1, n = 15000)
-# dim(edgeR_result)
+de.result <- topTags(lrt.coef2, p.value=0.05, n = 15000)
+dim(de.result)[[1]]
+de.result.df <- de.result[[1]]
+str(de.result.df)
+contig <- rownames(de.result.df)
+de.result.out <- cbind(contig, de.result.df)
+head(de.result.out)
 
-# ## Alternate method, usign decideTests
-# #?decideTests
-# deGenes <- decideTestsDGE(lrt, p=0.001)
-# deGenes <- rownames(lrt)[as.logical(deGenes)]
-# plotSmear(lrt, de.tags = deGenes)
-# abline(h=c(-1,1), col =2)
-# abline(v=cpm.filt, col =2)
-# 
-# deGenes
+### 6. Incorporate Annotations ####
+# expr.annot <- read.table(file = "../../go_enrichment_annotated_2017-09-11/contig_and_accession.txt", sep = "\t", header = T)
+# head(expr.annot)
 
-#### Export Results ####
-output <- topTags(lrt, n=nrow(lrt), sort.by="logFC")[[1]]
-write.csv(x = output, file = "output.csv")
+# Import the sequence annotation separator go_enrichment
+expr.annot.all <- read_tsv(file = "../../go_enrichment_annotated_2017-09-11/sequence_annotation.csv", na = "NA")
+dim(expr.annot.all)
+# convert to df for ease of use
+expr.annot.all.df <- as.data.frame(expr.annot.all)
+dim(expr.annot.all.df)
+colnames(expr.annot.all.df)
 
-# Different way:
-# group <- colnames(interp$file.name)
-# et <- exactTest(my.counts,  = sampleType)
+annotated.de <- merge(de.result.out, expr.annot.all.df, by.x = "contig", by.y = "Name" )
+dim(de.result.out)
+dim(annotated.de)
+str(annotated.de)
 
+# write annotated de
+write.table(x = annotated.de, file = "annotated_de.txt", quote = F, sep = "\t", row.names = F, col.names = T)
 
-# FINAL FIXES
-# need to incorporate the seasonality factor into the DE model
+#### 7. Export Results ####
+write.table(x = x, file = "differential_genes.txt", quote = F, sep = "\t"
+            , col.names = TRUE, row.names = F)
+write.table(x = contig, file = "significant_ids.txt", quote = F, sep = "\t", row.names = F, col.names = F)
 
 # Export only expressed genes:
 expr.contigs <- dimnames(lrt)[[1]]
-write.table(x = expr.contigs, file = "expr_contigs.csv" , quote = F, sep = ","
+write.table(x = expr.contigs, file = "all_ids.txt" , quote = F, sep = "\t"
           , row.names = F, col.names = FALSE)
 
-# #### 4. Prepare Output ####
-# # generate CPM matrix
-# normalized.output <- cpm(my.counts, normalized.lib.sizes = TRUE, log= F)
-# 
-# # Compare the raw counts to the normalized cpm values (not log)
-# my.counts$counts[1:5, 1:5] # not normalized, raw counts
-# normalized.output[1:5, 1:5] # normalized lib size calculated cpm values
-# 
-# # # output as normalized linear
-# # write.csv(normalized.output, file = "03_normalized_data/normalized_output_matrix.csv")
-# # 
-# # # # output as normalized log2 (in progress)
-# # normalized.output.log2 <- cpm(my.counts, normalized.lib.sizes = TRUE, log= T, prior.count = 1)
-# # write.csv(normalized.output, file = "03_normalized_data/normalized_output_matrix_log2.csv")
-# # 
-# # # output object
-# # save.image(file = "02_input_data/sfon_wgcna_01_output.RData") # save out existing data 

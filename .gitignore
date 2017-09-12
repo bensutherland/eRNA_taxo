@@ -20,3 +20,4 @@ begin
 *.pdf
 *.Rhistory
 *.clstr
+*.txt
