@@ -152,6 +152,7 @@ lrt.coef3 <- glmLRT(fit, coef = 3) # season
 lrt.coef4 <- glmLRT(fit, coef = 4) # pCO2 x season (effect of pCO2 depends on the season)
 
 # Set lrt of choice
+LOC <- lrt.coef3
 LOC <- lrt.coef2
 dim(topTags(LOC, p.value=0.05, n = 15000)) # how many genes DE w/ adj. p-val < 0.05
 
@@ -176,6 +177,51 @@ expr.annot.all.df <- as.data.frame(expr.annot.all)
 dim(expr.annot.all.df)
 colnames(expr.annot.all.df)
 
+# Annotate the full expressed genes
+# provides the order that the contigs are in in the dgelist
+dgelist.order <- dimnames(my.counts.test[[1]])[1]
+dgelist.order <- as.data.frame(dgelist.order[[1]])
+str(dgelist.order)
+
+dim(expr.annot.all.df)
+colnames(expr.annot.all.df)
+
+head(expr.annot.all.df)[,1]
+head(dgelist.order)
+
+str(expr.annot.all.df[,1])
+str(dgelist.order)
+
+# Make order a character to match the dataframe it will be merged with
+dgelist.order[,1] <- sapply(dgelist.order[,1], as.character)
+str(dgelist.order)
+colnames(dgelist.order) <- "Contig"
+
+# Confirm data structure type
+str(dgelist.order)
+str(expr.annot.all.df$Name)
+
+# Order dataframe by target
+ordered.annot.df <- expr.annot.all.df[match(dgelist.order$Contig, expr.annot.all.df$Name),]
+
+head(ordered.annot.df$Name)
+head(dgelist.order)
+
+dim(ordered.annot.df)
+names(ordered.annot.df)
+
+
+# Export only the expressed genes annotation
+write.table(x = ordered.annot.df[,1:2], file = "background_ids.txt", quote = F, sep = "\t", row.names = F, col.names = F)
+
+## Export the background list
+# str(dimnames(lrt))
+# 
+# expr.contigs <- dimnames(lrt)[[1]]
+# write.table(x = expr.contigs, file = "all_ids.txt" , quote = F, sep = "\t"
+#             , row.names = F, col.names = FALSE)
+
+
 annotated.de <- merge(de.result.out, expr.annot.all.df, by.x = "contig", by.y = "Name" )
 dim(de.result.out)
 dim(annotated.de)
@@ -183,6 +229,7 @@ str(annotated.de)
 
 # write annotated de
 write.table(x = annotated.de, file = "annotated_de.txt", quote = F, sep = "\t", row.names = F, col.names = T)
+#write.table(x = annotated.de, file = "annotated_de_season.txt", quote = F, sep = "\t", row.names = F, col.names = T)
 
 #### 7. Export Results ####
 write.table(x = x, file = "differential_genes.txt", quote = F, sep = "\t"
@@ -197,7 +244,7 @@ write.table(x = expr.contigs, file = "all_ids.txt" , quote = F, sep = "\t"
 
 # Temp (working)
 # to plot a single gene:
-boxplot(my.counts[[1]]["contig-60_950163_length_209_read_count_4",] ~ interp$Range)
+boxplot(my.counts[[1]]["contig-60_2892_length_1823_read_count_49",] ~ interp$Range)
 
 # to view contrasts
 lrt.coef2
