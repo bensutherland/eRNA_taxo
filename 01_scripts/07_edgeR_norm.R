@@ -194,3 +194,10 @@ expr.contigs <- dimnames(lrt)[[1]]
 write.table(x = expr.contigs, file = "all_ids.txt" , quote = F, sep = "\t"
           , row.names = F, col.names = FALSE)
 
+
+# Temp (working)
+# to plot a single gene:
+boxplot(my.counts[[1]]["contig-60_950163_length_209_read_count_4",] ~ interp$Range)
+
+# to view contrasts
+lrt.coef2
