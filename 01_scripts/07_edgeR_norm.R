@@ -231,5 +231,15 @@ boxplot(my.counts[[1]]["contig-60_2892_length_1823_read_count_49",] ~ interp$Ran
 boxplot(my.counts[[1]]["contig-60_1051284_length_201_read_count_158",] ~ interp$season)
 boxplot(my.counts[[1]]["contig-60_1051284_length_201_read_count_158",] ~ interp$Range)
 
+# example of one DE by both:
+boxplot(my.counts[[1]]["contig-60_100194_length_278_read_count_9",] ~ interp$season * interp$Range)
+
+# GOI style:
+#GOI <- "contig-60_653007_length_231_read_count_2"
+GOI <- "contig-60_108028_length_435_read_count_8"
+boxplot(my.counts[[1]][GOI,] ~ interp$season * interp$Range, main = GOI)
+
+
+
 # Aside, to view contrasts
 lrt.coef2
