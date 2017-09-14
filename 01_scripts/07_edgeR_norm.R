@@ -135,7 +135,7 @@ plotMDS(x = my.counts, cex = 0.8
 )
 
 # Plot (with sample ID short and date)
-plotMDS(x = my.counts, cex = 1.2
+plotMDS(x = my.counts, cex = 0.8
         , labels = paste(sep = "_",
             sub(pattern = "_.*", replacement = "", 
                 x=interp$file.name[match(row.names(my.counts$samples), interp$file.name)])
@@ -146,6 +146,49 @@ plotMDS(x = my.counts, cex = 1.2
 # # note, this is how matching works:
 # interp$sex[match(my.counts$samples$files, interp$file.name)] # matches order 
 # interp$sex #see not the same
+
+# Plot (with sample ID short and date)
+plotMDS(x = my.counts, cex = 0.8
+        , labels = paste(sep = "_",
+                         sub(pattern = "_.*", replacement = "", 
+                             x=interp$file.name[match(row.names(my.counts$samples), interp$file.name)])
+                         ,  interp$date[match(row.names(my.counts$samples), interp$file.name)]  
+        )
+)
+
+
+# Plot with flex
+colnames(interp)
+trait <- "season"
+
+plotMDS(x = my.counts, cex = 0.8
+        , labels = 
+        #  round(
+            interp[match(row.names(my.counts$samples), interp$file.name), trait]
+        #    , digits = 2)
+        )
+
+# with legend instead of text
+plotMDS(x = my.counts, cex = 0.8
+        , pch = as.numeric(interp[match(row.names(my.counts$samples), interp$file.name), trait])
+        #    , digits = 2)
+)
+
+# Final for report (sampleID_pCO2 colored by season)
+# Using gene.selection = common instead of pairwise. They both show similar, but common means the same genes are used to distinguish all samples
+plotMDS(x = my.counts, cex = 0.8, gene.selection = "pairwise"
+        , col = as.numeric(interp[match(row.names(my.counts$samples), interp$file.name), trait])
+        , labels = 
+          paste(sep = "_" 
+                , sub(pattern = "_.*", replacement = "", 
+                    x=interp$file.name[match(row.names(my.counts$samples), interp$file.name)])
+                , round(interp[match(row.names(my.counts$samples), interp$file.name), "pCO2"], digits = 1)
+)
+)
+
+legend(x="bottomright", legend=c("early summer", "late summer/fall"), fill = c("black","red"), cex = 0.8)
+# save out as 6.5 x 6.5
+
 
 
 #### 4. Create design matrix ####
