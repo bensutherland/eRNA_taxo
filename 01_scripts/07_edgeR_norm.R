@@ -231,10 +231,13 @@ lrt.coef4 <- glmLRT(fit, coef = 4) # pCO2 x season (effect of pCO2 depends on th
 # Obtain results
 de.result.pCO2 <- topTags(lrt.coef2, p.value=0.05, n = 15000) #pCO2
 de.result.season <- topTags(lrt.coef3, p.value=0.05, n = 15000) #season
+de.result.ifx <- topTags(lrt.coef4, p.value=0.05, n = 15000) #season
+dim(de.result.ifx)
 
 # Choose result
 #de.result <- de.result.pCO2
 de.result <- de.result.season
+#de.result <- de.result.ifx
 
 # Final formatting
 dim(de.result)[[1]]
@@ -255,6 +258,7 @@ str(annotated.de)
 # Choose appropriate name and save out the differential gene list
 #write.table(x = annotated.de, file = "annotated_de_pCO2.txt", quote = F, sep = "\t", row.names = F, col.names = T)
 write.table(x = annotated.de, file = "annotated_de_season.txt", quote = F, sep = "\t", row.names = F, col.names = T)
+#write.table(x = annotated.de, file = "annotated_de_ifx.txt", quote = F, sep = "\t", row.names = F, col.names = T)
 
 # For go_enrich version 
 # write.table(x = contig, file = "significant_ids.txt", quote = F, sep = "\t", row.names = F, col.names = F)
@@ -266,6 +270,9 @@ write.table(x = annotated.de, file = "annotated_de_season.txt", quote = F, sep =
 # Export all the expressed genes annotation
 write.table(x = ordered.annot.df[,1:2], file = "background_ids.txt", quote = F, sep = "\t", row.names = F, col.names = F)
 
+
+# Aside, to view contrasts
+lrt.coef2
 
 
 #### 8. Visualize single genes ####
@@ -279,10 +286,51 @@ boxplot(my.counts[[1]]["contig-60_100194_length_278_read_count_9",] ~ interp$sea
 
 # GOI style:
 #GOI <- "contig-60_653007_length_231_read_count_2"
-GOI <- "contig-60_108028_length_435_read_count_8"
+GOI <- "contig-60_10002_length_800_read_count_47"
 boxplot(my.counts[[1]][GOI,] ~ interp$season * interp$Range, main = GOI)
 
 
+# Top candidates:
+#GOI1 <- "contig-60_104578_length_274_read_count_12" # DNA-directed DNA polymerase
+GOI1 <- "contig-60_11283_length_1039_read_count_71" # Terminase, large subunit #Good #*#
+#GOI1 <- "contig-60_1356_length_1536_read_count_48" # Capsid, very low expressed
+#GOI1 <- "contig-60_169441_length_335_read_count_12" # Terminase again, good
+GOI2 <- "contig-60_950163_length_209_read_count_4" # DNA-directed DNA polymerase #*#, higher expr in high summer
+#GOI1 <- "contig-60_65888_length_522_read_count_6" # exonuclease #*#
 
-# Aside, to view contrasts
-lrt.coef2
+GOI <- GOI1
+boxplot(my.counts[[1]][GOI,] ~ interp$season * interp$Range, main = GOI, las = 1)
+
+
+# IFX
+GOI3 <- "contig-60_15091_length_922_read_count_56" # clamp
+#GOI3 <- "contig-60_65888_length_522_read_count_6" # exonuclease probable (same as others)
+
+
+GOI <- GOI3
+boxplot(my.counts[[1]][GOI,] ~ interp$season * interp$Range, main = GOI, las = 1) # v nice.. same #*#
+
+# MFX season
+GOI4 <- "contig-60_901732_length_210_read_count_0" # CRISPR-assoc #*#
+#GOI4 <- "contig-60_715759_length_223_read_count_4" # capsid
+#GOI4 <- "contig-60_118_length_4120_read_count_834" # Tail tubular protein
+
+GOI <- GOI4
+boxplot(my.counts[[1]][GOI,] ~ interp$season * interp$Range, main = GOI, las = 1)
+
+gene.names <- c("Terminase, large subunit"
+                , "DNA-directed DNA polymerase"
+                , "Clamp loader large subunit"
+                , "CRISPR-assoc. endonuc. Cas9")
+
+# Plot 2 x 2 individual genes
+par(mfrow=c(2,2), mar= c(2,3,2,1) + 0.2, mgp = c(2,0.75,0))
+
+GOIs <- c(GOI1, GOI2, GOI3, GOI4)
+for(goi in 1:length(GOIs)){
+  boxplot(my.counts[[1]][GOIs[goi],] ~ interp$season * interp$Range
+          , main = gene.names[goi]
+          , las = 1
+          , ylab = "read counts")
+}
+# save out as 11 x 7 in portrait
