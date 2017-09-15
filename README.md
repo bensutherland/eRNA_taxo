@@ -108,7 +108,7 @@ For this I suggest using Eric Normandeau's `go_enrichment` pipeline
 https://github.com/enormandeau/go_enrichment    
 This pipeline annotates with uniprot's swissprot database and performs enrichment tests with goatools https://github.com/tanghaibao/goatools.    
 
-# Optional: Annotate only expressed transcripts
+Optional: Annotate only expressed transcripts
 Unwrap fasta file
 Use fasta_unwrap.py from Eric Normandeau's scripts folder to unwrap the fasta file to obtain only the expressed contigs.
 
