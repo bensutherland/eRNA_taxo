@@ -89,7 +89,7 @@ First index the transcriptome:
 Launch bowtie2 mapping script:   
 `./01_scripts/04_bowtie2.sh`    
 
-This will produce .bam files. 
+This will produce .bam files. Note that the results of the alignment (the reporting from bowtie2) is not recorded anywhere, so to get percent aligned etc., I suggest saving this information, for example in a file called `07_mapped/report_alignment_result.txt`      
 
 Quantify bam files:
 `./01_scripts/05_express.sh`    
