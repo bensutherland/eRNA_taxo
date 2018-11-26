@@ -6,11 +6,11 @@
 TRIMMED_FOLDER="04_sorted"
 MAPPED_FOLDER="07_mapped"
 
-# Choose reference
-REFERENCE="06_metatranscriptome/16_libs_contig.fa"
+# Choose reference (basename)
+REFERENCE="06_metatranscriptome/16_libs_contig"
 
 # User variables
-NUM_THREADS="6"
+NUM_THREADS="12"
 
 # Map reads and add RG
 ls -1 $TRIMMED_FOLDER/*non_rRNA.fq |
