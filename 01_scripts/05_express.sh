@@ -7,7 +7,8 @@ COUNT_FOLDER="08_gx_levels"
 
 # Choose reference
 #REFERENCE="06_metatranscriptome/assemblies_merged_bbmap_reduced.fa"
-REFERENCE="06_metatranscriptome/assemblies_merged_red0.95_bbmap_red.fa"
+#REFERENCE="06_metatranscriptome/assemblies_merged_red0.95_bbmap_red.fa"
+REFERENCE="06_metatranscriptome/16_libs_contig.fa"
 
 # Produce counts per individual with express 
 ls -1 $MAPPED_FOLDER/*.sorted.bam |
@@ -16,7 +17,7 @@ ls -1 $MAPPED_FOLDER/*.sorted.bam |
     do
         echo "Counts for sample" $i
         name=$(basename $i)
-        express $REFERENCE $i --max-read-len=300
+        express $REFERENCE $i --max-read-len=300 --no-update-check
         mv results.xprs $COUNT_FOLDER/"$name"_results.xprs
         mv params.xprs $COUNT_FOLDER/"$name"_params.xprs 
     done
