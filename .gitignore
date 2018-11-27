@@ -15,6 +15,7 @@ begin
 05_assembled/*
 *.bt2
 .Rproj.user
+*.RData
 *.xprs
 *.csv
 *.pdf
