@@ -94,13 +94,15 @@ This will produce .bam files. Note that the results of the alignment (the report
 Quantify bam files:
 `./01_scripts/05_express.sh`    
 This produces several xprs files that are used in the next stage.  
+#todo# Put this into parallel
+
 
 ### 5. Normalization and Differential Expression
 Work within R to import the named results.xprs files and collect all into a single matrix file.   
-`01_scripts/prepare_gxlevels_matrix.R`   
+`01_scripts/06_prepare_gxlevels_matrix.R`   
 
 Work within R using the script in the directory     
-`01_scripts/06_edgeR_normalization.R`    
+`01_scripts/07_edgeR_norm.R`    
 
 
 ### 6. Annotate transcriptome
