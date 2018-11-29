@@ -5,115 +5,129 @@
 # Load data from normalization script
 load(file = "08_gx_levels/normalized.RData")
 
-#### 1. Annotation of expressed genes ####
-# # Import sequence annotation
-# expr.annot.all <- read_tsv(file = "../../go_enrichment_annotated_2017-09-11/sequence_annotation.csv", na = "NA")
-# #todo: instruct to move this file from go_enrichment into the eRNA_taxo folder
-# expr.annot.all.df <- as.data.frame(expr.annot.all) # convert to df for ease of use
-# dim(expr.annot.all.df)
-# colnames(expr.annot.all.df)
-# 
-# # provides the order that the contigs are in in the dgelist
-# dgelist.order <- dimnames(my.counts[[1]])[1]
-# dgelist.order <- as.data.frame(dgelist.order[[1]])
-# str(dgelist.order)
-# 
-# dgelist.order[,1] <- sapply(dgelist.order[,1], as.character) # Order into character for df matching
-# str(dgelist.order)
-# colnames(dgelist.order) <- "Contig"
-# 
-# str(dgelist.order) # Confirm data structure type
-# str(expr.annot.all.df$Name)
-# 
-# # Order dataframe by target
-# ordered.annot.df <- expr.annot.all.df[match(dgelist.order$Contig, expr.annot.all.df$Name),]
-# head(ordered.annot.df$Name) #to confirm
-# head(dgelist.order)
-# 
-# dim(ordered.annot.df)
-# names(ordered.annot.df)
-# 
-# # result: ordered.annot.df having annotation of all expressed genes
-# 
-# # Aside, for go_enrichment method of GO enrich
-# ## Export the background list
-# # str(dimnames(lrt))
-# # 
-# # expr.contigs <- dimnames(lrt)[[1]]
-# # write.table(x = expr.contigs, file = "all_ids.txt" , quote = F, sep = "\t"
-# #             , row.names = F, col.names = FALSE)
+### 1. Incorporate annotation ####
+# Import sequence annotation
+expr.annot.all <- read.delim2(file = "06_metatranscriptome/sequence_annotation.txt", header = T, sep = "\t")
+head(expr.annot.all)
+head(expr.annot.all$Name) # need to shorten to the first space
+expr.annot.all$Name <- gsub(pattern = "\ .*", replacement = "", x = expr.annot.all$Name) # keep only the first part of the name to match
+dim(expr.annot.all)
+expr.annot.all.df <- as.data.frame(expr.annot.all) # convert to df for ease of use
+dim(expr.annot.all.df)
+colnames(expr.annot.all.df)
+head(expr.annot.all.df)
 
 
-#### 2. Visualize data ####
-# Plot (with sample IDs)
-plotMDS(x = my.counts, cex= 0.8)
+# Combine the DGElist with the annotation
+#  NOT DONE YET 
 
-# Plot (with dates)
-plotMDS(x = my.counts, cex = 0.8
-        , labels = interp$date[match(row.names(my.counts$samples), interp$file.name)]
-)
+##### is this section needed?
+# provides the order that the contigs are in in the dgelist
+dgelist.order <- dimnames(my.counts[[1]])[1]
+dgelist.order <- as.data.frame(dgelist.order[[1]])
+str(dgelist.order)
 
-# Plot (with sample ID short and date)
+dgelist.order[,1] <- sapply(dgelist.order[,1], as.character) # Order into character for df matching
+str(dgelist.order)
+colnames(dgelist.order) <- "Contig"
+
+str(dgelist.order) # Confirm data structure type
+str(expr.annot.all.df$Name)
+
+# Order dataframe by target
+ordered.annot.df <- expr.annot.all.df[match(dgelist.order$Contig, expr.annot.all.df$Name),]
+head(ordered.annot.df$Name) #to confirm
+head(dgelist.order)
+
+dim(ordered.annot.df)
+names(ordered.annot.df)
+str(ordered.annot.df)
+
+# convert to character
+ordered.annot.df <- data.frame(lapply(ordered.annot.df, as.character), stringsAsFactors =F)
+str(ordered.annot.df)
+
+# result: ordered.annot.df having annotation of all expressed genes
+
+# Aside, for go_enrichment method of GO enrich
+## Export the background list
+# str(dimnames(lrt))
+#
+# expr.contigs <- dimnames(lrt)[[1]]
+# write.table(x = expr.contigs, file = "all_ids.txt" , quote = F, sep = "\t"
+#             , row.names = F, col.names = FALSE)
+##### is this section needed? (end)
+
+
+#### 2. Visualize PCA/MDS ####
+# Exploration plot (with sample ID short and selected variable)
+colnames(interp)
+variable <- "Calcite.om"
+# Note: if variable is numeric, you may need to uncomment out the digits argument below
+
 plotMDS(x = my.counts, cex = 0.8
         , labels = paste(sep = "_",
                          sub(pattern = "_.*", replacement = "", 
                              x=interp$file.name[match(row.names(my.counts$samples), interp$file.name)])
-                         ,  interp$date[match(row.names(my.counts$samples), interp$file.name)]  
+
+                         ,  
+#                         round(
+                         interp[match(row.names(my.counts$samples), interp$file.name), variable]  
+#                         , digits = 2)
         )
 )
 
-# # note, this is how matching works:
-# interp$sex[match(my.counts$samples$files, interp$file.name)] # matches order 
-# interp$sex #see not the same
 
-# Flexibly plot
-colnames(interp)
-trait <- "season"
-
-plotMDS(x = my.counts, cex = 0.8
-        , labels = 
-          #  round(
-          interp[match(row.names(my.counts$samples), interp$file.name), trait]
-        #    , digits = 2)
-)
-
-# with legend instead of text
-plotMDS(x = my.counts, cex = 0.8
-        , pch = as.numeric(interp[match(row.names(my.counts$samples), interp$file.name), trait])
-        #    , digits = 2)
-)
-
-## also can save the mds
-# plot.data <- plotMDS(x = my.counts)
-# then use $x and $y to place text
-
-# Final for report (sampleID_pCO2 colored by season)
-# Using gene.selection = common instead of pairwise. 
-#  They both show similar, but common means the same genes are used to distinguish all samples
+# Plot for report (sampleID_pCO2 colored by season)
+# Note: using gene.selection = common instead of pairwise means that the same genes are used to distinguish all samples
+pdf(file = "09_results/PCA_plot.pdf", width = 12.5, height = 8.5)
 MDS.plot.res <- plotMDS(x = my.counts, cex = 0.8, gene.selection = "common"
-                , col = as.numeric(interp[match(row.names(my.counts$samples), interp$file.name), trait])
-                , labels = 
-                    paste(sep = "_" 
-                      , sub(pattern = "_.*", replacement = ""
-                      , x=interp$file.name[match(row.names(my.counts$samples), interp$file.name)])
-                      , round(interp[match(row.names(my.counts$samples), interp$file.name), "pCO2"], digits = 1)
-          )
+                        , col = as.numeric(interp[match(row.names(my.counts$samples), interp$file.name), trait])
+                        , labels = 
+                          paste(sep = "_" 
+                                , sub(pattern = "_.*", replacement = ""
+                                      , x=interp$file.name[match(row.names(my.counts$samples), interp$file.name)])
+                                , round(interp[match(row.names(my.counts$samples), interp$file.name), "pCO2"], digits = 1)
+                                , interp[match(row.names(my.counts$samples), interp$file.name), "date"]
+                          )
 )
 
 legend(x="bottomright", legend=c("early summer", "late summer/fall"), fill = c("black","red"), cex = 0.8)
 #text(x = 1.5, y = 2, labels = "Sample_pCO2", cex = 1.2)
 # save out as 6.5 x 6.5
+dev.off()
 
-## May want to use a different pca method to find top loading genes
-# simple.pca <- prcomp(x = my.counts)
-# summary(simple.pca)
-# library(devtools)
-# install_github("vqv/ggbiplot")
-# library(ggbiplot)
-# ggbiplot(simple.pca)
+### Alternate options:
+## e.g. use symbols
+plotMDS(x = my.counts, cex = 0.8
+        , pch = as.numeric(interp[match(row.names(my.counts$samples), interp$file.name), trait])
+        )
+
+## e.g. save coordinates so you can add text later
+# plot.data <- plotMDS(x = my.counts)
+# then use $x and $y to place text
 
 
-#### 3. Create design matrix ####
+##### Alternate PCA approach ####
+y <- cpm(my.counts, log = T, prior.count = 3) # returns log2 vals
+pca <- prcomp( t( y ), scale  = T)
+
+# Use package factoextra for visualization
+# install.packages("factoextra")
+library("factoextra")
+fviz_eig(pca) # view the Percent variance explained (first three matter)
+fviz_pca_ind(pca, repel = T, axes = c(1,2))
+fviz_pca_ind(pca, repel = T, axes = c(2,3))
+
+# find top loading genes?
+res.var <- get_pca_var(pca)
+head(res.var$contrib)
+boxplot(res.var$contrib[,1]) #for example, boxplot the top loading genes
+summary(res.var$contrib[,1])
+names(which(res.var$contrib[,1] > 0.01)) # e.g. top loading..
+
+
+#### 3. Differential expression analysis ####
 # Use approximated variables in bins
 binary.pCO2 <- interp$Range 
 binary.season <- interp$season
@@ -122,15 +136,8 @@ binary.season <- interp$season
 designMat <- model.matrix(~binary.pCO2 * binary.season)
 
 # Estimate dispersions (measure inter-library variation per tag)
-
 # to note, then delete #
-# IT appears that estimateDisp is for simpler models, whereas estimateGLMCommon etc. is for when doing glms
-#my.counts <- estimateDisp(my.counts, design=designMat) # note that this can use a design matrix when provided 
-#"qCML method is only applicable on datasets with a single factor design
-#since it fails to take into account the effects from multiple factors in a more complicated
-#experiment."
-# end to note then delete #
-
+# estimateDisp for simpler models; estimateGLMCommon (etc) is for when doing glms
 my.counts <- estimateGLMCommonDisp(my.counts, design=designMat)
 my.counts <- estimateGLMTrendedDisp(my.counts, design=designMat)
 my.counts <- estimateGLMTagwiseDisp(my.counts, design=designMat)
@@ -140,10 +147,11 @@ sqrt(my.counts$common.disp) #coeff of var, for biol. var
 
 plotBCV(my.counts)
 
-#### 5. Differential Expression ####
+# create glm fit
 fit <- glmFit(y = my.counts, design = designMat)
 #lrt <- glmLRT(glmfit = fit, coef = 3)
 
+designMat
 # Find DE genes for each contrast
 lrt.coef1 <- glmLRT(fit, coef = 1) # intercept (all genes)
 lrt.coef2 <- glmLRT(fit, coef = 2) # pCO2
@@ -154,7 +162,10 @@ lrt.coef4 <- glmLRT(fit, coef = 4) # pCO2 x season (effect of pCO2 depends on th
 de.result.pCO2 <- topTags(lrt.coef2, p.value=0.05, n = 15000) #pCO2
 de.result.season <- topTags(lrt.coef3, p.value=0.05, n = 15000) #season
 de.result.ifx <- topTags(lrt.coef4, p.value=0.05, n = 15000) #season
-dim(de.result.ifx)
+
+nrow(de.result.pCO2) #747
+nrow(de.result.season) #2792
+nrow(de.result.ifx) # 3
 
 # Choose result
 #de.result <- de.result.pCO2
@@ -166,11 +177,11 @@ dim(de.result)[[1]]
 de.result.df <- de.result[[1]]
 str(de.result.df)
 contig <- rownames(de.result.df)
-de.result.out <- cbind(contig, de.result.df)
+de.result.out <- cbind(contig , de.result.df)
+de.result.out$contig <- as.character(de.result.out$contig)
 head(de.result.out)
+str(de.result.out)
 
-
-### ANNOTATION
 # Bring in annotation onto the de.result
 annotated.de <- merge(de.result.out, ordered.annot.df, by.x = "contig", by.y = "Name" )
 dim(de.result.out)
@@ -178,7 +189,7 @@ dim(annotated.de)
 str(annotated.de)
 
 
-#### 7. Export Results ####
+#### 4. Export Results ####
 # Choose appropriate name and save out the differential gene list
 #write.table(x = annotated.de, file = "annotated_de_pCO2.txt", quote = F, sep = "\t", row.names = F, col.names = T)
 write.table(x = annotated.de, file = "annotated_de_season.txt", quote = F, sep = "\t", row.names = F, col.names = T)
@@ -196,8 +207,11 @@ write.table(x = ordered.annot.df[,1:2], file = "background_ids.txt", quote = F, 
 
 
 # Aside, to view contrasts
-lrt.coef2
+# lrt.coef2
 
+
+
+#### HERE BE DRAGONS #####
 
 #### 8. Visualize single genes ####
 # to plot a single gene:
