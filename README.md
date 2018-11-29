@@ -11,7 +11,7 @@ This pipeline was developed as part of the Molecular Genetics Lab at Pacific Bio
 `cd-hit-est`http://weizhongli-lab.org/cd-hit/     
 `bowtie2`   http://bowtie-bio.sourceforge.net/bowtie2/index.shtml     
 `express`   https://pachterlab.github.io/eXpress/index.html      
-
+`factoextra` http://www.sthda.com/english/wiki/factoextra-r-package-easy-multivariate-data-analyses-and-elegant-visualization
 
 ### 1. Quality check and trimming
 #### Run FastQC on raw data   
@@ -117,4 +117,12 @@ Specifically, use the steps 1-3 of `go_enrichment`.
 Then obtain output:    
 `cp go_enrichment/sequence_annotation.txt eRNA_taxo/06_metatranscriptome`       
 
+### 7. Incorporate annotation and complete expression analysis
+Load the results from the normalization above (i.e. `08_gx_levels/normalized.RData`) into R and analyze with the script `01_scripts/08_expr_analysis.R`.    
+This will:     
+Incorporate the annotation     
+Build PCA and MDS plots      
+Perform differential expression analysis    
+Export results with annotation     
+Create plots for individual genes of interest       
 
