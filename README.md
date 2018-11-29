@@ -97,23 +97,24 @@ This produces several xprs files that are used in the next stage.
 #todo# Put this into parallel
 
 
-### 5. Normalization and Differential Expression
+### 5. Prepare gene expression data matrix, low expression filter, normalize
 Work within R to import the named results.xprs files and collect all into a single matrix file.   
 `01_scripts/06_prepare_gxlevels_matrix.R`   
 
-Work within R using the script in the directory     
+Work within R to filter data, normalize and output a list of expressed contigs.     
 `01_scripts/07_edgeR_norm.R`    
-
+This will produce the file `08_gx_levels/expr_contigs.csv`, which can be used in the next section for annotation.   
 
 ### 6. Annotate transcriptome
-For this I suggest using Eric Normandeau's `go_enrichment` pipeline    
+Subset the metatranscriptome assembly to obtain only expressed contigs using the following command (note: takes long time):    
+`awk '{ print $1"\ "}' 08_gx_levels/expr_contigs.csv | xargs -I{} grep -A1 {} 06_metatranscriptome/16_libs_contig.fa > 06_metatranscriptome/16_libs_contig_expr_only.fa`    
+
+To annotate this fasta file, I suggest using Eric Normandeau's `go_enrichment` pipeline:    
 https://github.com/enormandeau/go_enrichment    
 This pipeline annotates with uniprot's swissprot database and performs enrichment tests with goatools https://github.com/tanghaibao/goatools.    
 
-Optional: Annotate only expressed transcripts
-Unwrap fasta file
-Use fasta_unwrap.py from Eric Normandeau's scripts folder to unwrap the fasta file to obtain only the expressed contigs.
+Specifically, use the steps 1-3 of `go_enrichment`.     
+Then obtain output:    
+`cp go_enrichment/sequence_annotation.txt eRNA_taxo/06_metatranscriptome`       
 
-`for i in `cat expr_contigs.csv` ; do grep -A1 $i 06_met
-atranscriptome/assemblies_merged_red0.95_bbmap_red_unwrapped.fa ; done > 06_metatranscriptome/selected_contigs_2017-09-09.fa`
 
