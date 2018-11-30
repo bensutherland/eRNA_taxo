@@ -53,7 +53,7 @@ str(expr.list)
 
 # Just in case, you may save out the result, as this is a large object that can take a lot of time to produce
 # save.image(file = "expr.list.RData")
-
+# load(file = "08_gx_levels/expr.list.RData")
 
 # Build final matrix file
 # Create variable with first column as the transcript ID
