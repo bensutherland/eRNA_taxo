@@ -2,7 +2,7 @@
 # Will produce "08_gx_levels/expr_contigs.csv"
 
 # Clear space
-#rm(list=ls())
+# rm(list=ls())
 
 ## Install packages
 #source("http://bioconductor.org/biocLite.R")
@@ -41,47 +41,50 @@ dim(my.counts)
 # my.counts <- my.counts.bk # CAUTION go backwarks
 
 # Set up DGEList
-rownames(my.counts) <- my.counts[,1]
-my.counts.round <- round(my.counts[,-1])
+rownames(my.counts) <- my.counts[,1] # contig names assigned as rownames
+my.counts.round <- round(my.counts[,-1]) # round expr values to nearest whole number
 str(my.counts)
-str(my.counts.round)
+str(my.counts.round) # to confirm
 
-# create DGElist
+# Create DGElist
 my.counts <- DGEList(counts = my.counts.round)
 
-#### 2. Filter Data ####
+#### 2. Filter Data Based on Low Expression ####
 # Find an optimal cpm filt (edgeRuserguide suggests 5-10 reads mapping to transcript)
 min.reads.mapping.per.transcript <- 5
 cpm.filt <- min.reads.mapping.per.transcript / min(my.counts$samples$lib.size) * 1000000
 cpm.filt # min cpm filt
 
-min.ind <- 5 # choose the minimum number of individuals that need to pass the threshold
+# Minimum number of individuals needed to call the transcript expressed
+min.ind <- 5
 
-# identify tags passing filter
+# Identify tags passing filter
 keep <- rowSums(cpm(my.counts)>cpm.filt) >= min.ind # Find which transcripts pass the filter
-table(keep) # gives number passing, number failing
-##16_lib: total retained (TRUE) = 32,866 transcripts of 7,971,030
-##bbmap_only: total retained (TRUE) =    
-##cdhit95_bbmap: total retained (TRUE) Logan = 20488 # Xavier 20363
+table(keep) # TRUE = expressed
 
-# subset DGEList
-my.counts <- my.counts[keep, , keep.lib.sizes=FALSE] #keep.lib.sizes = T retains original lib sizes, otherwise recomputes w remaining tags
+# Subset DGEList based on these low expressed tags
+my.counts <- my.counts[keep, , keep.lib.sizes=FALSE] # keep.lib.sizes = T retains original lib sizes, otherwise recomputes w remaining tags
 dim(my.counts)
+
 
 #### 3. Normalization ####
 # Use TMM normalization, as it takes into account highly expressed genes that may take up sequencing rxn and make other genes look down-reg.
 my.counts <- calcNormFactors(my.counts, method = c("TMM"))
 my.counts$samples
-
-# Plot norm.factors by library size
-plot(my.counts$samples$norm.factors ~ my.counts$samples$lib.size)
+plot(my.counts$samples$norm.factors ~ my.counts$samples$lib.size) # Plot norm.factors by library size
 
 
-#### 4. Save results and export background list for annotation ####
-# save normalized image
-save.image(file = "08_gx_levels/normalized.RData")
+#### 5. Prepare Output ####
+# Generate filtered, CPM matrix, linear or log2
+normalized.output.linear <- cpm(my.counts, normalized.lib.sizes = T, log = F)
+write.csv(normalized.output.linear, file = "08_gx_levels/normalized_output_linear.csv", quote = F)
+
+normalized.output.log2 <- cpm(my.counts, normalized.lib.sizes = T, log = T, prior.count = 1)
+write.csv(normalized.output.log2, file = "08_gx_levels/normalized_output_log2.csv", quote = F)
 
 # Export background list for annotation
 expr.contigs <- dimnames(my.counts)[[1]]
 write.table(x = expr.contigs, sep = ",", file = "08_gx_levels/expr_contigs.csv", row.names = F, quote = F, col.names = F)
 
+# Save overall normalized image
+save.image(file = "08_gx_levels/normalized.RData")
