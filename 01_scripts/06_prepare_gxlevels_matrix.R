@@ -74,4 +74,4 @@ filename <- paste("out_matrix", "ref", ref.genome, version, date, sep = "_")
 filename <- paste0(filename, ".csv")
 filename 
 
-write.csv(x = out.matrix, file = filename, row.names = F)
+write.csv(x = out.matrix, file = filename, row.names = F, quote = F)
