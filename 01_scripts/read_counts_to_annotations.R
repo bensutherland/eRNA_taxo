@@ -1,5 +1,5 @@
 # Connect read counts to the annotations and plot
-# Input: output of obitab (read counts per sample) and MEGAN (taxonomy ID per amplicon)
+# Input: RData from normalization step (post-filter, CPM) and MEGAN (taxonomy ID per amplicon)
 
 # rm(list=ls())
 
@@ -17,10 +17,28 @@ setwd(working.dir)
 
 ## Create a filenames list that contains file names for each dataset (1st obitab output; 2nd MEGAN output)
 filenames.list <- list()
+
+# # Root taxonomy level
+# filenames.list[["eRNA_taxo"]] <- setNames(object = c(
+#                   "08_gx_levels/normalized_output_linear.csv" # counts file
+#                 , "16_libs_contig_expr_only_taxonomy_hits-ex.txt") # annot file (TO BE MOVED)
+#                                        , nm = c("count", "annot"))
+
+# Family-level
+# filenames.list[["eRNA_taxo"]] <- setNames(object = c(
+#                 "08_gx_levels/normalized_output_linear.csv" # counts file
+#                 , "16_libs_contig_expr_only_taxonomy_hits-ex_Family.txt") # annot file (TO BE MOVED)
+#                                       , nm = c("count", "annot"))
+
+# Family-level (and all)
 filenames.list[["eRNA_taxo"]] <- setNames(object = c(
-                  "08_gx_levels/normalized_output_linear.csv" # counts file
-                , "16_libs_contig_expr_only_taxonomy_hits-ex.txt") # annot file (TO BE MOVED)
-                                       , nm = c("count", "annot"))
+  "08_gx_levels/normalized_output_linear.csv" # counts file
+  , "16_libs_contig_expr_only_taxonomy_hits-ex_Family_and_all.txt") # annot file (TO BE MOVED)
+  , nm = c("count", "annot"))
+
+
+
+filenames.list[["eRNA_taxo"]][2]
 
 #### 1.0 Import input data and merge #####
 paste("You are analyzing ", datatype, sep = "")
@@ -37,7 +55,7 @@ counts <- normalized.output.linear.df
 # annot <- read.delim2(paste(filenames.list[[datatype]][2], sep = ""), header = F
 #                      , col.names = c("id","taxon"))
 
-annot <- read.delim2("16_libs_contig_expr_only_taxonomy_hits-ex.txt", header = F, col.names = c("id", "taxon")
+annot <- read.delim2(filenames.list[["eRNA_taxo"]][2], header = F, col.names = c("id", "taxon")
                      , colClasses = c("character", "character"))
 str(annot)
 
@@ -85,12 +103,13 @@ head(data)
 str(data)
 
 # total number of reads dealing with
+# Note the difference between normalized data size and non-normalized data size
 sum(colSums(data[,3:ncol(data)]))
 # per sample
 colSums(data[,3:ncol(data)]) # confirm, because this seems greater than the lib sizes earlier..
 
-sum(my.counts$counts[,1]) # see, this is the number of actual reads, which matches the 'lib.size' within the DGElist. So the normalization must increase this value
-sum(my.counts$samples$lib.size)
+sum(my.counts$counts[,1]) # see, this is the number of actual reads for first sample, which matches the 'lib.size' within the DGElist. So the normalization must increase this value
+sum(my.counts$samples$lib.size) # this is all of the lib sizes
 
 
 data.df <- data
@@ -109,7 +128,9 @@ dim(data.df)
 data.df <- data.df[ ! data.df$taxon %in% species.remove, ]
 dim(data.df) # see how the number of taxa is reduced
 ### for eRNA_taxo, a ton of data is unassigned or unknown
-
+# goes from 32866 rows (contigs) to 2490!
+str(data.df)
+sum(data.df[,3:ncol(data.df)]) # still contains 1,891,674 CPM though..
 
 #### 2. Get proportional and count data by taxon per site ####
 # Set nulls
@@ -163,6 +184,8 @@ for(i in 1:length(count.list)){
 
 head(counts.df)
 
+##### ADDING SAMPLE NAMES #####
+# would be a good place to rename certain columns if necessary
 # Incorporate location names
 # instead of the following ### NOT WORKING ###
 # site.names <- sample.locations[1:length(prop.df[1,])] # Assumes is in same order for the two major types individually (SOG or C3)
@@ -172,13 +195,11 @@ colnames(counts.df) <- site.names # name counts.df
 head(prop.df)
 head(counts.df)
 
-#### TO UPDATE #####
 # Set filenames for saving out
-# count.output.csv.filename <- paste("05_annotated/", datatype, "_count_by_taxa.csv", sep = "")
-# prop.output.csv.filename <- paste("05_annotated/", datatype, "_prop_by_taxa.csv", sep = "")
+count.output.csv.filename <- paste("09_results/", datatype, "_count_by_taxa.csv", sep = "")
+prop.output.csv.filename <- paste("09_results/", datatype, "_prop_by_taxa.csv", sep = "")
 # write.csv(x = counts.df, file = count.output.csv.filename)
 # write.csv(x = prop.df, file = prop.output.csv.filename)
-#### END TO UPDATE ####
 
 
 # Find total numbers of reads mapping (###CPM HERE##)
@@ -196,10 +217,8 @@ counts.filtered.df[which(counts.filtered.df < min.count)]
 counts.filtered.df[which(counts.filtered.df < min.count)] <- 0
 head(counts.filtered.df)
 
-### TO FIX ###
-#counts.filtered.filename <- paste("05_annotated/", datatype, "_count_by_taxa_filt_at_", min.count, ".csv", sep = "")
+counts.filtered.filename <- paste("09_results/", datatype, "_count_by_taxa_filt_at_", min.count, ".csv", sep = "")
 # write.csv(x = counts.filtered.df, file = counts.filtered.filename)
-##### END TO FIX #####
 
 ##### 4.0 Prepare plotting (colors) ####
 # Prepare palette
@@ -225,7 +244,7 @@ palette <- c(cols,cols2,cols3,cols4,cols5,cols6,cols7,cols8,cols9,cols10,cols11,
 length(palette)
 
 # Randomly select from palette
-set.seed(123)
+set.seed(100)
 index <- sample(1:nrow(counts.df))
 index
 
@@ -238,16 +257,6 @@ if(length(index) > length(palette)){
 } else {
   this.palette <- palette[index]
 }
-
-
-#### 4.1 Drop Mock Column ####
-# # This will remove the mock column for purposes of plotting as it overwhelms all of the data (due to too much sequencing for this)
-# if("sample.Mock" %in% colnames(counts.df) == T){
-#   counts.df <- counts.df[,-(which(colnames(counts.df)=="sample.Mock"))]
-#   prop.df <- prop.df[,-(which(colnames(prop.df)=="sample.Mock"))]
-#   site.names <- site.names[-(which(site.names == "sample.Mock"))]
-#   sample.reads <- sample.reads[-(which(names(sample.reads)=="sample.Mock"))]
-# }
 
 
 # ##### 4.2 Create Legend ####
