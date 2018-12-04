@@ -117,6 +117,12 @@ Specifically, use the steps 1-3 of `go_enrichment`.
 Then obtain output:    
 `cp go_enrichment/sequence_annotation.txt eRNA_taxo/06_metatranscriptome`       
 
+Want to see how many unannotated?   
+##TODO, currently doesn't work without giving the number of unannotated..##
+grep -vE '^Name' sequence_annotati
+on.txt | awk -F"\t" '{ print $2 }' - | sort | uniq -c | grep -vE '10745' - | awk '{ print $1 }' - | paste -sd+ - | bc   
+
+
 ### 7. Incorporate annotation and complete expression analysis
 Load the results from the normalization above (i.e. `08_gx_levels/normalized.RData`) into R and analyze with the script `01_scripts/08_expr_analysis.R`.    
 This will:     
