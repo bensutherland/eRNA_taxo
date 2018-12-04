@@ -25,3 +25,4 @@ begin
 *.png
 *.rma6
 *.xlsx*
+*.txt#
