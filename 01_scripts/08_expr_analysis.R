@@ -81,6 +81,7 @@ plotMDS(x = my.counts, cex = 0.8
 # Plot for report (sampleID_pCO2 colored by season)
 # Note: using gene.selection = common instead of pairwise means that the same genes are used to distinguish all samples
 pdf(file = "09_results/PCA_plot.pdf", width = 12.5, height = 8.5)
+trait <- "season"
 MDS.plot.res <- plotMDS(x = my.counts, cex = 0.8, gene.selection = "common"
                         , col = as.numeric(interp[match(row.names(my.counts$samples), interp$file.name), trait])
                         , labels = 
@@ -125,7 +126,7 @@ head(res.var$contrib)
 boxplot(res.var$contrib[,1]) #for example, boxplot the top loading genes
 summary(res.var$contrib[,1])
 names(which(res.var$contrib[,1] > 0.01)) # e.g. top loading..
-
+# Need to find out how to find top-loading genes for PC2
 
 #### 3. Differential expression analysis ####
 # Use approximated variables in bins
@@ -211,12 +212,57 @@ write.table(x = ordered.annot.df[,1:2], file = "background_ids.txt", quote = F, 
 
 
 
-#### HERE BE DRAGONS #####
+#### Plotting GOIs #####
+
+GOI1 <- "contig-60_1777509" # Terminase, large subunit
+GOI2 <- "contig-60_1307617" # Tail sheath protein (Vibrio phage)
+GOI3 <- "contig-60_557998" # DNA-directed RNA polymerase
+GOI4 <- "contig-60_495817" # "Sliding-clamp-loader gp44 subunit"
+
+# # Single Gene
+# GOI1 <- GOI2
+# boxplot(my.counts[[1]][GOI,] ~ interp$season, main = GOI)
+
+gene.names <- c("Terminase, large subunit"
+                , "Tail sheath protein"
+                , "DNA-directed RNA polymerase"
+                , "Sliding-clamp-loader gp44 subunit")
+
+# Plot 2 x 2 individual genes
+par(mfrow=c(2,2), mar= c(2,3,2,1) + 0.2, mgp = c(2,0.75,0))
+
+
+# These should not be extracted from my.counts, but rather from the normalized cpm data for plotting
+# extracted from my.counts (incorrect)
+# GOIs <- c(GOI1, GOI2, GOI3, GOI4)
+# for(goi in 1:length(GOIs)){
+#   boxplot(my.counts[[1]][GOIs[goi],] ~ interp$season
+#           , main = gene.names[goi]
+#           , las = 1
+#           , ylab = "read counts")
+# }
+# save out as 11 x 7 in portrait
+
+# my.counts[[1]][1:5,1:5]
+# colSums(my.counts[[1]])
+
+# extracted from cpm-normalized
+GOIs <- c(GOI1, GOI2, GOI3, GOI4)
+for(goi in 1:length(GOIs)){
+  boxplot(normalized.output.linear[GOIs[goi],] ~ interp$season
+          , main = gene.names[goi]
+          , las = 1
+          , ylab = "read counts (CPM)")
+}
+
+
+
+
 
 #### 8. Visualize single genes ####
 # to plot a single gene:
 boxplot(my.counts[[1]]["contig-60_2892_length_1823_read_count_49",] ~ interp$Range )
-boxplot(my.counts[[1]]["contig-60_1051284_length_201_read_count_158",] ~ interp$season)
+boxplot(my.counts[[1]]["contig-60_280",] ~ interp$season)
 boxplot(my.counts[[1]]["contig-60_1051284_length_201_read_count_158",] ~ interp$Range)
 
 # example of one DE by both:
@@ -230,7 +276,7 @@ boxplot(my.counts[[1]][GOI,] ~ interp$season * interp$Range, main = GOI)
 
 # Top candidates:
 #GOI1 <- "contig-60_104578_length_274_read_count_12" # DNA-directed DNA polymerase
-GOI1 <- "contig-60_11283_length_1039_read_count_71" # Terminase, large subunit #Good #*#
+GOI1 <- "contig-60_1777509" # Terminase, large subunit #Good #*#
 #GOI1 <- "contig-60_1356_length_1536_read_count_48" # Capsid, very low expressed
 #GOI1 <- "contig-60_169441_length_335_read_count_12" # Terminase again, good
 GOI2 <- "contig-60_950163_length_209_read_count_4" # DNA-directed DNA polymerase #*#, higher expr in high summer
@@ -241,7 +287,7 @@ boxplot(my.counts[[1]][GOI,] ~ interp$season * interp$Range, main = GOI, las = 1
 
 
 # IFX
-GOI3 <- "contig-60_15091_length_922_read_count_56" # clamp
+GOI3 <- "contig-60_94482" # clamp
 #GOI3 <- "contig-60_65888_length_522_read_count_6" # exonuclease probable (same as others)
 
 
