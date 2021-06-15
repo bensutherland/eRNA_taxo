@@ -1,5 +1,5 @@
-# ACRDP Shellfish Water Transcriptome Project #
-This pipeline was developed as part of the Molecular Genetics Lab at Pacific Biological Station (Nanaimo, BC) in the working group of Kristi Miller. The pipeline is developed for the purpose of analyzing data in the lab and comes with no warrantee or guarantees.   
+# Metatranscriptomics of shellfish hatchery intake water #
+This pipeline was developed as part of the Molecular Genetics Lab at Pacific Biological Station (Nanaimo, BC) in the working group of Kristi Miller. The pipeline is developed for the purpose of analyzing data in the lab for this specific project and comes with no warrantee or guarantees of usefulness for anything else.      
 
 ## Requirements:
 `fastqc` (currently: v0.11.5) https://www.bioinformatics.babraham.ac.uk/projects/fastqc/     
@@ -125,6 +125,7 @@ on.txt | awk -F"\t" '{ print $2 }' - | sort | uniq -c | grep -vE '10745' - | awk
 
 ### 7. Incorporate annotation and complete expression analysis
 Load the results from the normalization above (i.e. `08_gx_levels/normalized.RData`) into R and analyze with the script `01_scripts/08_expr_analysis.R`.    
+
 This will:     
 Incorporate the annotation     
 Build PCA and MDS plots      
